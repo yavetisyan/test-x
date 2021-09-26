@@ -1,0 +1,41 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #000;
+}
+
+#main {
+  text-align: center;
+  padding: 0 10px;
+}
+
+canvas {
+  display: block;
+  margin: 0 auto;
+}
+
+.tetris {
+  margin: 50px auto;
+  width: 320px;
+  height: 620px;
+  border: 10px solid dimgrey;
+  font-size: 0;
+}
+.block {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #141413;
+  display: inline-block;
+
+}
+.movingBlock {
+  background-color: darkmagenta;
+}
+
+.fixedBlock {
+  background-color: deepskyblue;
+}
