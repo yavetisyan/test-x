@@ -28,9 +28,9 @@ canvas {
 .block {
   width: 30px;
   height: 30px;
-  border: 1px solid #141413;
   display: inline-block;
-
+  border: 1px solid rgb(145, 115, 115);
+  box-shadow: -2px -2px 7px 0px; /*-3px -2px 10px 0*/
 }
 .movingBlock {
   background-color: darkmagenta;
@@ -38,4 +38,10 @@ canvas {
 
 .fixedBlock {
   background-color: deepskyblue;
+}
+
+.tet__score,
+.tet__level {
+  color: #fff;
+  font-size: 30px;
 }
