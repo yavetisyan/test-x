@@ -1,6 +1,9 @@
 // Game structure
 
 let main = document.querySelector(".tetris");
+let nextBlockElem = document.querySelector(".nextBlock");
+let gameOver = document.querySelector(".game__over");
+
 let score = 0;
 let scoreElem = document.querySelector(".score");
 let levelElem = document.querySelector(".level");
@@ -22,12 +25,12 @@ let posLevel = {
     speed: 200,
     nextLevelScore: 150,
   },
-	43: {
+  4: {
     scorePerLine: 40,
     speed: 100,
     nextLevelScore: 160,
   },
-	5: {
+  5: {
     scorePerLine: 50,
     speed: 50,
     nextLevelScore: 2500,
@@ -56,16 +59,7 @@ let playfield = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ];
 
-let activeBlock = {
-  column: 0,
-  row: 3,
-  figur: [
-    [0, 1, 1, 0],
-    [0, 1, 1, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-  ],
-};
+//let playfield = new Array(10).fill(Array(20).fill(0));
 
 let figures = {
   O: [
@@ -98,12 +92,15 @@ let figures = {
     [0, 0, 0],
   ],
   I: [
-    [0, 1, 0, 0],
-    [0, 1, 0, 0],
-    [0, 1, 0, 0],
-    [0, 1, 0, 0],
+    [1, 1, 1, 1],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
   ],
 };
+
+let activeBlock = randomBlocks();
+let nextBlock = randomBlocks();
 
 // add Active blocks
 function addActiveBlock() {
@@ -136,7 +133,13 @@ function rotateBlock() {
 function randomBlocks() {
   const randomFigures = "IOLJTSZ";
   const rand = Math.floor(Math.random() * 7);
-  return figures[randomFigures[rand]];
+  const newBlock = figures[randomFigures[rand]];
+
+  return {
+    column: 0,
+    row: Math.floor((10 - newBlock[0].length) / 2),
+    figur: newBlock,
+  };
 }
 
 // remove Active blocks
@@ -184,6 +187,22 @@ function drawBlock() {
   main.innerHTML = mainInner;
 }
 
+// next block
+
+function drowNextBlock() {
+  let nextMainInner = "";
+  for (let column = 0; column < nextBlock.figur.length; column++) {
+    for (let row = 0; row < nextBlock.figur[column].length; row++) {
+      if (nextBlock.figur[column][row]) {
+        nextMainInner += '<div class = "block movingBlock"></div>';
+      } else {
+        nextMainInner += '<div class = "block"></div>';
+      }
+    }
+    nextMainInner += "<br/>";
+  }
+  nextBlockElem.innerHTML = nextMainInner;
+}
 // fixing block
 function fixedBlock() {
   for (let column = 0; column < playfield.length; column++) {
@@ -217,23 +236,23 @@ function checkLines() {
   }
   switch (fieldLines) {
     case 1:
-      score += 10;
+      score += posLevel[currentLevel].scorePerLine;
       break;
     case 2:
-      score += 10 * 3;
+      score += posLevel[currentLevel].scorePerLine;
       break;
     case 3:
-      score += 10 * 6;
+      score += posLevel[currentLevel].scorePerLine;
       break;
     case 4:
-      score += 10 * 12;
+      score += posLevel[currentLevel].scorePerLine;
       break;
   }
 
   scoreElem.innerHTML = score;
   if (score >= posLevel[currentLevel].nextLevelScore) {
     currentLevel++;
-		levelElem.innerHTML = currentLevel
+    levelElem.innerHTML = currentLevel;
   }
 }
 
@@ -243,9 +262,11 @@ function moveBlocksDown() {
     activeBlock.column -= 1;
     fixedBlock();
     removeActiveBlock();
-    activeBlock.figur = randomBlocks();
-    activeBlock.row = Math.floor((10 - activeBlock.figur[0].length) / 2);
-    activeBlock.column = 0;
+    activeBlock = nextBlock;
+    if (hasCollisions()) {
+			gameOver.style.opacity = 1
+    }
+    nextBlock = randomBlocks();
   }
 }
 
@@ -289,11 +310,12 @@ document.addEventListener("keydown", function (e) {
       break;
 
     case "Enter":
-      moveGame();
+      startGame();
       break;
   }
   addActiveBlock();
   drawBlock();
+  drowNextBlock();
 });
 
 scoreElem.innerHTML = score;
@@ -301,6 +323,7 @@ levelElem.innerHTML = currentLevel;
 
 addActiveBlock();
 drawBlock();
+drowNextBlock();
 
 // timer
 let playPause;
@@ -309,6 +332,7 @@ function startGame() {
   moveBlocksDown();
   addActiveBlock();
   drawBlock();
+  drowNextBlock();
   playPause = setTimeout(startGame, posLevel[currentLevel].speed);
 }
 function pauseGame() {
